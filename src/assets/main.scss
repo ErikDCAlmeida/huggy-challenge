@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+
+:root {
+  --font-base: 16;
+  font-size: 16px;
+}
+
+* {
+  font-family: "Roboto", "Open Sans", "sans-serif";
+}
+
+.h1 {
+  font-style: normal !important;
+  font-weight: 400 !important;
+  font-size: 1.5em !important;
+  line-height: 2em !important;
+}
+
+.h2 {
+  font-style: normal !important;
+  font-weight: 500 !important;
+  font-size: 1.25em !important;
+  line-height: 1.75em !important;
+  letter-spacing: 0.15px !important;
+}
+
+.sub-1 {
+  font-style: normal !important;
+  font-weight: 400 !important;
+  font-size: 1em !important;
+  line-height: 1.5em !important;
+  letter-spacing: 0.15px !important;
+}
+
+.sub-2 {
+  font-style: normal !important;
+  font-weight: 500 !important;
+  font-size: 0.875em !important;
+  line-height: 1.125em !important;
+  letter-spacing: 0.1px !important;
+}
+
+.body-1 {
+  font-style: normal !important;
+  font-weight: 400 !important;
+  font-size: 1em !important;
+  line-height: 1.5em !important;
+  letter-spacing: 0.5px !important;
+}
+
+.body-2 {
+  font-style: normal !important;
+  font-weight: 400 !important;
+  font-size: 0.875em !important;
+  line-height: 1.125em !important;
+  letter-spacing: 0.25px !important;
+}
+
+.button-font {
+  font-style: normal !important;
+  font-weight: 500 !important;
+  font-size: 0.875em !important;
+  line-height: 1.125em !important;
+  letter-spacing: 1.25px !important;
+}
+
+.caption {
+  font-style: normal !important;
+  font-weight: 500 !important;
+  font-size: 0.75em !important;
+  line-height: 1em !important;
+  letter-spacing: 0.4px !important;
+}
+
+.pa-0 {
+  padding: 0 !important;
+}
+
+.border-none {
+  border: unset !important;
+}
+
+// Colors
+$colors: (
+  background: #f8f8f8,
+  foreground: #262626,
+  placeholder: #949494,
+  button-color: #321bde,
+  button-color-flat: #2715b065,
+  white-start: #ffffff,
+  danger: #de321b,
+  alizarin-crimson-500: #ad2213,
+  background-user: #f8f7fd,
+  persian-blue-800: #180d6e,
+  mine-shaft-400: #505050,
+  mine-shaft-100: #757575,
+  mine-shaft-30: #e1e1e1,
+  mine-shaft-60: #b1b1b1,
+);
+
+@each $color, $value in $colors {
+  .#{$color}--text {
+    color: #{$value} !important;
+  }
+  .#{$color}--bg {
+    background-color: #{$value} !important;
+  }
+  .#{$color}--border {
+    border-color: #{$value} !important;
+  }
+}
