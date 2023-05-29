@@ -8,7 +8,7 @@
           'hc-input__area-input--focused button-color--border':
             isFocused && !compact && !readonly,
           'hc-input__area-input--error alizarin-crimson-500--border':
-            !!error && !isFocused,
+            !!(errorMessage ?? error) && !isFocused,
           'hc-input__area-input--disabled': disabled,
           'hc-input__area-input--compact': compact,
         },
@@ -39,22 +39,24 @@
         :placeholder="placeholder"
         :disabled="disabled"
         :readonly="readonly"
-        :min="min"
-        :max="max"
+        :minlength="min"
+        :maxlength="max"
         @focus="isFocused = true"
         @blur="isFocused = false"
       />
     </div>
     <Transition name="fade">
       <div v-if="!hideMessages" class="hc-input--error-message">
-        <p class="caption danger--text">{{ error }}</p>
+        <p class="caption danger--text">{{ errorMessage ?? error }}</p>
       </div>
     </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useSlots, computed, ref, type PropType } from "vue";
+import { useSlots, computed, ref, type PropType, toRef } from "vue";
+import type { RuleExpression } from "vee-validate";
+import { useField } from "vee-validate";
 const emits = defineEmits(["update:modelValue"]);
 const props = defineProps({
   readonly: Boolean,
@@ -70,24 +72,29 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  name: {
+    type: String,
+    required: true,
+  },
   placeholder: {
     type: String,
     default: "Digite aqui...",
   },
   min: {
-    type: Number,
-    default: 0,
+    type: String,
+    default: "0",
   },
   max: {
-    type: Number,
-    default: 200,
+    type: String,
+    default: "200",
   },
+  rules: [String, Object, Array] as PropType<RuleExpression<any>>,
   maxSize: Number,
   textCenter: Boolean,
   compact: Boolean,
   hideMessages: Boolean,
   disabled: Boolean,
-  modelValue: [String, Number] as PropType<string | number>,
+  modelValue: {} as PropType<any>,
 });
 
 defineExpose({
@@ -97,13 +104,31 @@ defineExpose({
 
 const hasSlotIcon = computed(() => slots.icon);
 
+const { value, errorMessage } = useField(
+  toRef(props, "name"),
+  toRef(props, "rules"),
+  {
+    label: toRef(props, "name"),
+    initialValue: props.modelValue,
+  }
+);
+
 const valueInput = computed({
   get: () =>
     props.type === "phone"
       ? phoneNormalized(String(props.modelValue))
       : props.modelValue,
   set: (newValue) => {
-    emits("update:modelValue", newValue);
+    value.value =
+      props.type === "phone"
+        ? String(newValue).replace(/[^0-9]+/g, "")
+        : newValue;
+    emits(
+      "update:modelValue",
+      props.type === "phone"
+        ? String(newValue).replace(/[^0-9]+/g, "")
+        : newValue
+    );
   },
 });
 
@@ -124,7 +149,9 @@ function blur() {
 function phoneNormalized(value: string) {
   if (!value) return "";
   value = value.replace(/\D/g, "");
+  value = value.replace(/(\d{2})(\d)/, "+($1) $2");
   value = value.replace(/(\d{2})(\d)/, "($1) $2");
+  value = value.replace(/(\d)(\d{2})/, "$1 $2");
   value = value.replace(/(\d)(\d{4})$/, "$1-$2");
   return value;
 }

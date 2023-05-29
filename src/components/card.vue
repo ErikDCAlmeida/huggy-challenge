@@ -1,6 +1,6 @@
 <template>
   <div class="hc-card flex col">
-    <div class="hc-card__slot white-start--bg fill-a">
+    <div class="hc-card__slot flex col white-start--bg fill-a">
       <div
         :class="['hc-card__slot--header', { [`${color}--bg`]: color }]"
       ></div>
@@ -22,6 +22,7 @@ defineProps({
 <style lang="scss">
 .hc-card {
   min-width: min-content !important;
+  border-radius: 1em 1em 0 0;
   &__slot {
     position: relative;
     border-radius: 1em;

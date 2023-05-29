@@ -138,11 +138,20 @@
         @update:modelValue="page = $event"
       ></HCGrid>
     </div>
+
+    <HCLoadIndicator />
   </div>
 </template>
 
 <script setup lang="ts">
-import { HCUser, HCButton, HCGrid, HCInput, HCIcon } from "@/components";
+import {
+  HCUser,
+  HCButton,
+  HCGrid,
+  HCInput,
+  HCIcon,
+  HCLoadIndicator,
+} from "@/components";
 import { ref } from "vue";
 const valueInputText = ref("");
 const page = ref(0);

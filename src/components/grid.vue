@@ -1,3 +1,63 @@
+<script setup lang="ts">
+import { HCUser, HCButton, HCIcon, HCInput } from "@/components";
+import { ref, type PropType, computed } from "vue";
+
+const hoverLine = ref(-1);
+
+const emits = defineEmits([
+  "update:modelValue",
+  "click-row",
+  "edit",
+  "delete",
+  "down-button",
+  "up-button",
+]);
+
+const props = defineProps({
+  request: {
+    type: Array as PropType<Array<any>>,
+    default: null,
+    required: true,
+  },
+});
+
+const sortByName = ref(false);
+const pressedLine = ref(-1);
+// const requestPageValue = computed(() => props.request.page);
+
+// const actualPage = ref(0);
+
+// const pageNormalized = computed({
+//   get: () => requestPageValue.value,
+//   set: (newValue) => {
+//     if (newValue >= 1 && newValue <= totalPageNormalized.value) {
+//       actualPage.value = newValue;
+//       emits("update:modelValue", newValue);
+//     }
+//   },
+// });
+
+// const totalPageNormalized = computed(() => props.request?.totalPages);
+
+const arrayNormalized = computed({
+  get: () => {
+    return props.request;
+  },
+  set: (items) => {
+    arrayNormalized.value = items.sort(
+      (before: any, after: any) => before.name - after.name
+    );
+  },
+});
+
+function clickRow(item: any) {
+  if (!item.disabled) {
+    pressedLine.value = item.id;
+  }
+  emits("click-row", item);
+}
+</script>
+
 <template>
   <div class="hc-grid">
     <div class="hc-grid__header">
@@ -22,7 +82,7 @@
         v-for="item in arrayNormalized"
         :key="item.id"
         :class="[
-          ' hc-grid__body__item py-3',
+          ' hc-grid__body__item py-2',
           {
             'mine-shaft-30--bg': item.id === pressedLine,
             'c-not-allowed': item.disabled,
@@ -47,19 +107,28 @@
           compact
           readonly
           :disabled="item.disabled"
+          placeholder="Não informado!"
+          hide-messages
+          name="name"
         ></HCInput>
         <HCInput
           v-model:model-value="item.email"
           compact
           readonly
+          hide-messages
+          placeholder="Não informado!"
           :disabled="item.disabled"
+          name="email"
         ></HCInput>
         <HCInput
           v-model:model-value="item.phone"
           compact
           readonly
           type="phone"
+          hide-messages
           :disabled="item.disabled"
+          placeholder="Não informado!"
+          name="phone"
         ></HCInput>
         <div class="flex justify-center">
           <HCButton
@@ -89,7 +158,7 @@
         </div>
       </div>
     </div>
-    <div v-if="request.totalPages > 1" class="hc-grid__footer pa-2 flex">
+    <!-- <div v-if="request?.totalPages > 1" class="hc-grid__footer pa-2 flex">
       <div class="flex-1"></div>
       <div class="flex start-center hc-grid__footer__pagination">
         <HCButton
@@ -129,75 +198,9 @@
           <HCIcon>arrow-up</HCIcon>
         </HCButton>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
-
-<script setup lang="ts">
-import { HCUser, HCButton, HCIcon, HCInput } from "@/components";
-import { ref, type PropType, computed } from "vue";
-
-export interface RequestType {
-  items: Array<any>;
-  page: number;
-  pageSize: number;
-  totalPages: number;
-  totalItems: number;
-}
-
-const hoverLine = ref(-1);
-
-const emits = defineEmits([
-  "update:modelValue",
-  "click-row",
-  "edit",
-  "delete",
-  "down-button",
-  "up-button",
-]);
-
-const props = defineProps({
-  request: {
-    type: Object as PropType<RequestType>,
-    default: null,
-    required: true,
-  },
-});
-
-const sortByName = ref(false);
-const pressedLine = ref(-1);
-const requestPageValue = ref(props.request.page);
-
-const pageNormalized = computed({
-  get: () => requestPageValue.value,
-  set: (newValue) => {
-    if (newValue >= 1 && newValue <= totalPageNormalized.value) {
-      requestPageValue.value = newValue;
-      emits("update:modelValue", newValue);
-    }
-  },
-});
-
-const totalPageNormalized = computed(() => props.request.totalPages);
-
-const arrayNormalized = computed({
-  get: () => {
-    return props.request.items;
-  },
-  set: (items) => {
-    arrayNormalized.value = items.sort(
-      (before, after) => before.name - after.name
-    );
-  },
-});
-
-function clickRow(item: any) {
-  if (!item.disabled) {
-    pressedLine.value = item.id;
-  }
-  emits("click-row", item);
-}
-</script>
 
 <style lang="scss">
 .hc-grid {
