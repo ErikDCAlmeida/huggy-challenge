@@ -168,14 +168,15 @@ import {
   HCInput,
   HCIcon,
   HCLoadIndicator,
-} from "@/components";
+} from "../components";
 import { onMounted, ref } from "vue";
+import { useTokenStore } from "../stores/token";
+import { useRouter } from "vue-router";
+
 const valueInputText = ref("");
 const page = ref(0);
 const caracteres = ref("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
 const request = ref([]);
-import { useTokenStore } from "../stores/token";
-import { useRouter } from "vue-router";
 
 const token_store = useTokenStore();
 
