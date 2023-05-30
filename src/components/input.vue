@@ -88,7 +88,7 @@ const props = defineProps({
     type: String,
     default: "200",
   },
-  rules: [String, Object, Array] as PropType<RuleExpression<any>>,
+  rules: [String, Object, Array, Function] as PropType<RuleExpression<any>>,
   maxSize: Number,
   textCenter: Boolean,
   compact: Boolean,
@@ -120,14 +120,10 @@ const valueInput = computed({
       : props.modelValue,
   set: (newValue) => {
     value.value =
-      props.type === "phone"
-        ? String(newValue).replace(/[^0-9]+/g, "")
-        : newValue;
+      props.type === "phone" ? String(newValue).replace(/\D/g, "") : newValue;
     emits(
       "update:modelValue",
-      props.type === "phone"
-        ? String(newValue).replace(/[^0-9]+/g, "")
-        : newValue
+      props.type === "phone" ? String(newValue).replace(/\D/g, "") : newValue
     );
   },
 });
@@ -149,7 +145,7 @@ function blur() {
 function phoneNormalized(value: string) {
   if (!value) return "";
   value = value.replace(/\D/g, "");
-  value = value.replace(/(\d{2})(\d)/, "+($1) $2");
+  value = value.replace(/(\d{2})(\d)/, "+$1 $2");
   value = value.replace(/(\d{2})(\d)/, "($1) $2");
   value = value.replace(/(\d)(\d{2})/, "$1 $2");
   value = value.replace(/(\d)(\d{4})$/, "$1-$2");

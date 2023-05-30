@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { HCUser, HCButton, HCIcon, HCInput } from "@/components";
 import { ref, type PropType, computed } from "vue";
+import { useInfiniteScroll } from "@vueuse/core";
 
 const hoverLine = ref(-1);
 
@@ -9,8 +10,9 @@ const emits = defineEmits([
   "click-row",
   "edit",
   "delete",
-  "down-button",
-  "up-button",
+  // "down-button",
+  // "up-button",
+  "update:sortDesc",
 ]);
 
 const props = defineProps({
@@ -19,9 +21,20 @@ const props = defineProps({
     default: null,
     required: true,
   },
+  onLoadMore: {} as PropType<any>,
+  sortDesc: Boolean,
 });
 
-const sortByName = ref(false);
+const element = ref();
+
+useInfiniteScroll(
+  element,
+  async () => {
+    await props.onLoadMore();
+  },
+  { distance: 10 }
+);
+
 const pressedLine = ref(-1);
 // const requestPageValue = computed(() => props.request.page);
 
@@ -51,35 +64,32 @@ const arrayNormalized = computed({
 });
 
 function clickRow(item: any) {
-  if (!item.disabled) {
-    pressedLine.value = item.id;
+  if (!item.item.disabled) {
+    pressedLine.value = item.item.id;
   }
   emits("click-row", item);
 }
 </script>
 
 <template>
-  <div class="hc-grid">
+  <div v-if="arrayNormalized.length" class="hc-grid">
     <div class="hc-grid__header">
       <div></div>
       <div
-        :class="[
-          'flex align-center caption py-2 pl-2 hc-grid__item__header--name-area',
-          { 'mine-shaft-30--bg c-pointer': sortByName },
-        ]"
-        @mouseover.prevent="sortByName = true"
-        @mouseleave="sortByName = false"
+        class="flex align-center c-pointer caption py-2 pl-2 hc-grid__header--name-area"
+        @click="emits('update:sortDesc', !sortDesc)"
       >
         <span class="mr-1">Nome</span>
-        <HCIcon>arrow-down</HCIcon>
+        <HCIcon v-if="sortDesc">arrow-down</HCIcon>
+        <HCIcon v-else>arrow-up</HCIcon>
       </div>
       <div class="caption flex start-center">E-mail</div>
       <div class="caption flex start-center">Telefone</div>
       <div></div>
     </div>
-    <div class="hc-grid__body">
+    <div class="hc-grid__body" ref="element">
       <div
-        v-for="item in arrayNormalized"
+        v-for="(item, index) in arrayNormalized"
         :key="item.id"
         :class="[
           ' hc-grid__body__item py-2',
@@ -88,7 +98,7 @@ function clickRow(item: any) {
             'c-not-allowed': item.disabled,
           },
         ]"
-        @click="clickRow(item)"
+        @click="clickRow({ item, index })"
         @mouseover="hoverLine = item.id"
         @mouseleave="hoverLine = -1"
       >
@@ -130,7 +140,7 @@ function clickRow(item: any) {
           placeholder="Não informado!"
           name="phone"
         ></HCInput>
-        <div class="flex justify-center">
+        <div class="flex center">
           <HCButton
             v-if="
               (hoverLine === item.id || item.id === pressedLine) &&
@@ -139,7 +149,7 @@ function clickRow(item: any) {
             icon
             flat
             class="mr-2"
-            @click.stop="$emit('edit', item)"
+            @click.stop="$emit('edit', { item, index })"
           >
             <HCIcon name="edit" />
           </HCButton>
@@ -151,7 +161,7 @@ function clickRow(item: any) {
             icon
             flat
             danger
-            @click.stop="$emit('delete', item)"
+            @click.stop="$emit('delete', { item, index })"
           >
             <HCIcon name="delete" />
           </HCButton>
@@ -217,6 +227,13 @@ function clickRow(item: any) {
     border-bottom: 1px solid #e1e1e1;
     border-radius: 8px 8px 0px 0px;
     overflow-x: auto;
+    &--name-area {
+      &:hover {
+        background-color: #321bde;
+        color: #ffffff;
+        border-radius: 2px;
+      }
+    }
     &::-webkit-scrollbar {
       background-color: #b1b1b12f;
       width: 0.5em;
@@ -226,13 +243,10 @@ function clickRow(item: any) {
       border-radius: 8px;
       background-color: #312bde;
     }
-    &--name-area {
-      border-radius: 8px;
-      transition: all ease-in-out 0.25s;
-    }
   }
   &__body {
     overflow-y: scroll;
+    padding-right: 2px;
     &::-webkit-scrollbar {
       background-color: #b1b1b12f;
       width: 0.5em;

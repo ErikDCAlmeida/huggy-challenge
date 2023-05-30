@@ -3,30 +3,36 @@
     :class="[
       'hc-button px-3 py-2 sub-2 flex center c-pointer',
       {
+        [`hc-button--loading c-not-allowed`]: loading,
         [`hc-button--${buttonType}--hover`]:
           (primary || secondary || danger) &&
           !pressed &&
           !disabled &&
           !icon &&
-          !flat,
+          !flat &&
+          !loading,
         'button-color--bg white-start--text':
-          primary && !disabled && !pressed && !icon && !flat,
+          primary && !disabled && !pressed && !icon && !flat && !loading,
         'white-start--bg mine-shaft-400--text':
-          secondary && !disabled && !pressed && !icon && !flat,
+          secondary && !disabled && !pressed && !icon && !flat && !loading,
         'white-start--bg danger--text':
-          danger && !disabled && !pressed && !icon && !flat,
+          danger && !disabled && !pressed && !icon && !flat && !loading,
         [`hc-button--${buttonType}--disabled c-not-allowed`]:
-          disabled && !icon && !flat,
+          disabled && !icon && !flat && !loading,
         [`hc-button--${buttonType}--pressed`]:
-          (primary || secondary || danger) && pressed && !icon && !flat,
+          (primary || secondary || danger) &&
+          pressed &&
+          !icon &&
+          !flat &&
+          !loading,
         'hc-button--icon': icon,
         [`hc-button--icon--${buttonType}`]:
-          icon && (primary || secondary || danger),
+          icon && (primary || secondary || danger) && !loading,
         'hc-button--flat': flat,
         'hc-button--flat--pressed':
-          flat && pressed && (!primary || !secondary || !danger),
+          flat && pressed && (!primary || !secondary || !danger) && !loading,
         [`hc-button--flat--pressed--${buttonType}`]:
-          (primary || secondary || danger) && pressed && flat,
+          (primary || secondary || danger) && pressed && flat && !loading,
       },
     ]"
     @click="pressed = true"
@@ -34,10 +40,15 @@
     @focus="pressed = true"
     @blur="pressed = false"
   >
-    <div v-if="slotIconActived" class="mr-2 caption flex center">
-      <slot name="icon"></slot>
+    <div v-if="loading" class="fill-a flex a-center j-center mr-2">
+      <img src="@/assets/preloader.svg" :width="16" />
     </div>
-    <slot></slot>
+    <div class="flex center">
+      <div v-if="slotIconActived" class="mr-2 caption flex center">
+        <slot name="icon"></slot>
+      </div>
+      <slot></slot>
+    </div>
   </button>
 </template>
 
@@ -73,6 +84,7 @@ const props = defineProps({
   },
   icon: Boolean,
   flat: Boolean,
+  loading: Boolean,
 });
 </script>
 
@@ -83,6 +95,12 @@ const props = defineProps({
   outline: none;
   border: none;
   transition: all ease-in-out 0.25s;
+  &--loading {
+    background-color: transparent !important;
+    color: #757575 !important;
+    border: 1px solid #2715b048 !important;
+    pointer-events: none;
+  }
   &--primary {
     &--hover {
       &:hover {
@@ -96,6 +114,7 @@ const props = defineProps({
     &--disabled {
       background-color: #e1e1e1 !important;
       color: #757575 !important;
+      pointer-events: none;
     }
   }
   &--secondary {
@@ -111,6 +130,7 @@ const props = defineProps({
     &--disabled {
       background-color: #ffffff !important;
       color: #949494 !important;
+      pointer-events: none;
     }
   }
   &--danger {
@@ -126,6 +146,7 @@ const props = defineProps({
     &--disabled {
       background-color: #ffffff !important;
       color: #949494 !important;
+      pointer-events: none;
     }
   }
   &--icon {

@@ -46,6 +46,9 @@
           </template>
           <template #default>Button</template>
         </HCButton>
+        <HCButton class="mr-5" loading @click="testeClickBtn">
+          Button
+        </HCButton>
       </div>
 
       <div class="mr-10 flex">
@@ -86,15 +89,16 @@
     </div>
     <div class="flex ma-5">
       <div class="mr-10 flex-1">
-        <HCInput class="mb-5" label="Input" disabled></HCInput>
-        <HCInput class="mb-5" label="Input"></HCInput>
-        <HCInput class="mb-5" label="Input"></HCInput>
-        <HCInput class="mb-5" label="Input"></HCInput>
-        <HCInput class="mb-5" compact readonly></HCInput>
+        <HCInput name="tste" class="mb-5" label="Input" disabled></HCInput>
+        <HCInput name="tste" class="mb-5" label="Input"></HCInput>
+        <HCInput name="tste" class="mb-5" label="Input"></HCInput>
+        <HCInput name="tste" class="mb-5" label="Input"></HCInput>
+        <HCInput name="tste" class="mb-5" compact readonly></HCInput>
       </div>
       <div class="flex-1">
         <pre>Valor do Input: {{ valueInputText }}</pre>
         <HCInput
+          name="tste"
           v-model:modelValue="valueInputText"
           class="mb-5"
           label="Input"
@@ -106,6 +110,7 @@
           </template>
         </HCInput>
         <HCInput
+          name="tste"
           v-model:modelValue="valueInputText"
           class="mb-5"
           label="Input"
@@ -114,17 +119,29 @@
             <HCIcon>search</HCIcon>
           </template></HCInput
         >
-        <HCInput class="mb-5" label="Input" error="Mensagem de error"
+        <HCInput
+          name="tste"
+          class="mb-5"
+          label="Input"
+          error="Mensagem de error"
           ><template #icon>
             <HCIcon>search</HCIcon>
           </template></HCInput
         >
-        <HCInput class="mb-5" label="Input" error="Mensagem de error"
+        <HCInput
+          name="tste"
+          class="mb-5"
+          label="Input"
+          error="Mensagem de error"
           ><template #icon>
             <HCIcon>search</HCIcon>
           </template></HCInput
         >
-        <HCInput class="mb-5" label="Input" error="Mensagem de error"
+        <HCInput
+          name="tste"
+          class="mb-5"
+          label="Input"
+          error="Mensagem de error"
           ><template #icon>
             <HCIcon>search</HCIcon>
           </template></HCInput
@@ -152,35 +169,27 @@ import {
   HCIcon,
   HCLoadIndicator,
 } from "@/components";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 const valueInputText = ref("");
 const page = ref(0);
 const caracteres = ref("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
-const request = ref({
-  items: Array.from({ length: 25 }, (_, i) => ({
-    id: i,
-    photo:
-      "https://lh3.googleusercontent.com/hTLnP_A__DtkJNOgVM2V31QMErc0GIWqwmjEPUnU7MvVOcJHVUxvFfJqqV-8WjNmyvf0JKOmzcn-enmcqslTw-Xbea3jquD3_aPVXg",
-    initials: "HC",
-    name: `${getChartAt()}${getChartAt()}`,
-    email: "teste@teste.com",
-    phone: "79912345678",
-  })),
-  page: 1,
-  pageSize: 25,
-  totalPages: 2,
-  totalItems: 30,
-});
+const request = ref([]);
+import { useTokenStore } from "@/stores/token";
+import { useRouter } from "vue-router";
 
-function getChartAt() {
-  return caracteres.value.charAt(
-    Math.floor(Math.random() * caracteres.value.length)
-  );
-}
+const token_store = useTokenStore();
+
+const router = useRouter();
 
 function testeClickBtn() {
   alert("teste");
 }
+
+onMounted(() => {
+  if (!token_store.token.access_token) {
+    router.replace("/");
+  }
+});
 </script>
 
 <style scoped></style>

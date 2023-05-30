@@ -1,11 +1,12 @@
 <template>
-  <HCLoadIndicator :on-load="initialLoad">
-    <div class="flex col center fill-a">
-      <p class="h1 mb-2">Login</p>
-      <HCButton class="home-btn" @click="goToRegister">
-        Fazer login com a Huggy
-      </HCButton>
-    </div>
+  <HCLoadIndicator
+    :on-load="initialLoad"
+    content-class="flex col center fill-a"
+  >
+    <p class="h1 mb-2">Login</p>
+    <HCButton class="home-btn" @click="goToRegister">
+      Fazer login com a Huggy
+    </HCButton>
   </HCLoadIndicator>
 </template>
 
@@ -25,7 +26,7 @@ async function initialLoad() {
   }
 
   if (token_store.token.expires_in <= Date.now()) {
-    await axios<IToken>("http://localhost:8080/login", {
+    await axios<IToken>("http://localhost:8080/oauth/access_token", {
       method: "POST",
       headers: {
         "Access-Control-Allow-Origin": "*",

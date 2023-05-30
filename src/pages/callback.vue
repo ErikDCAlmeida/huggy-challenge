@@ -9,7 +9,7 @@ const route = useRoute();
 const token_store = useTokenStore();
 
 async function requestToken() {
-  await axios<IToken>("http://localhost:8080/login", {
+  await axios<IToken>("http://localhost:8080/oauth/access_token", {
     method: "POST",
     headers: {
       "Access-Control-Allow-Origin": "*",
