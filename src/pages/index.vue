@@ -26,19 +26,22 @@ async function initialLoad() {
   }
 
   if (token_store.token.expires_in <= Date.now()) {
-    await axios<IToken>("http://localhost:8080/oauth/access_token", {
-      method: "POST",
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json",
-      },
-      data: {
-        grant_type: "refresh_token",
-        client_id: import.meta.env.VITE_CLIENT_ID,
-        client_secret: import.meta.env.VITE_CLIENT_SECRET,
-        refresh_token: token_store.token.refresh_token,
-      },
-    }).then(({ data }) => {
+    await axios<IToken>(
+      "https://main--huggy-challenge.netlify.app/oauth/access_token",
+      {
+        method: "POST",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+        },
+        data: {
+          grant_type: "refresh_token",
+          client_id: import.meta.env.VITE_CLIENT_ID,
+          client_secret: import.meta.env.VITE_CLIENT_SECRET,
+          refresh_token: token_store.token.refresh_token,
+        },
+      }
+    ).then(({ data }) => {
       token_store.setToken(data);
     });
   } else {

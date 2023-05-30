@@ -166,7 +166,7 @@ async function onLoadMore() {
   if (!hasMore) {
     return;
   }
-  await axios("http://localhost:8080/api/contacts", {
+  await axios("https://main--huggy-challenge.netlify.app/api/contacts", {
     method: "GET",
     headers: {
       "Access-Control-Allow-Origin": "*",
@@ -194,7 +194,7 @@ async function onLoadMore() {
 async function submitForm() {
   savingContact.value = true;
   await axios(
-    `http://localhost:8080/api/contacts${
+    `https://main--huggy-challenge.netlify.app/api/contacts${
       infosUser.value.isNew ? "" : `/${infosUser.value.user.id}`
     }`,
     {
@@ -236,15 +236,18 @@ async function submitForm() {
 
 async function deleteContact() {
   savingContact.value = true;
-  await axios(`http://localhost:8080/api/contacts/${infosUser.value.user.id}`, {
-    method: "DELETE",
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `${token_store.token.token_type} ${token_store.token.access_token}`,
-    },
-  }).then(() => contacts.value.splice(infosUser.value.indexUserClicked, 1));
+  await axios(
+    `https://main--huggy-challenge.netlify.app/api/contacts/${infosUser.value.user.id}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `${token_store.token.token_type} ${token_store.token.access_token}`,
+      },
+    }
+  ).then(() => contacts.value.splice(infosUser.value.indexUserClicked, 1));
   savingContact.value = false;
   openDialogDelete.value = false;
 }

@@ -9,21 +9,24 @@ const route = useRoute();
 const token_store = useTokenStore();
 
 async function requestToken() {
-  await axios<IToken>("http://localhost:8080/oauth/access_token", {
-    method: "POST",
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    data: {
-      grant_type: "authorization_code",
-      redirect_uri: import.meta.env.VITE_REDIRECT_URI,
-      client_id: import.meta.env.VITE_CLIENT_ID,
-      client_secret: import.meta.env.VITE_CLIENT_SECRET,
-      code: route.query.code,
-    },
-  }).then(({ data }) => {
+  await axios<IToken>(
+    "https://main--huggy-challenge.netlify.app/oauth/access_token",
+    {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      data: {
+        grant_type: "authorization_code",
+        redirect_uri: import.meta.env.VITE_REDIRECT_URI,
+        client_id: import.meta.env.VITE_CLIENT_ID,
+        client_secret: import.meta.env.VITE_CLIENT_SECRET,
+        code: route.query.code,
+      },
+    }
+  ).then(({ data }) => {
     token_store.setToken(data);
   });
   window.close();
