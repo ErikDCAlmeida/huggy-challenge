@@ -27,7 +27,7 @@ async function initialLoad() {
 
   if (token_store.token.expires_in <= Date.now()) {
     await axios<IToken>(
-      "https://main--huggy-challenge.netlify.app/oauth/access_token",
+      "https://huggy-challenge.netlify.app/oauth/access_token",
       {
         method: "POST",
         headers: {

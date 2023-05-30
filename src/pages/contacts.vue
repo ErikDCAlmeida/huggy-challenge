@@ -166,7 +166,7 @@ async function onLoadMore() {
   if (!hasMore) {
     return;
   }
-  await axios("https://main--huggy-challenge.netlify.app/api/contacts", {
+  await axios("https://huggy-challenge.netlify.app/api/contacts", {
     method: "GET",
     headers: {
       "Access-Control-Allow-Origin": "*",
@@ -194,7 +194,7 @@ async function onLoadMore() {
 async function submitForm() {
   savingContact.value = true;
   await axios(
-    `https://main--huggy-challenge.netlify.app/api/contacts${
+    `https://huggy-challenge.netlify.app/api/contacts${
       infosUser.value.isNew ? "" : `/${infosUser.value.user.id}`
     }`,
     {
@@ -237,7 +237,7 @@ async function submitForm() {
 async function deleteContact() {
   savingContact.value = true;
   await axios(
-    `https://main--huggy-challenge.netlify.app/api/contacts/${infosUser.value.user.id}`,
+    `https://huggy-challenge.netlify.app/api/contacts/${infosUser.value.user.id}`,
     {
       method: "DELETE",
       headers: {

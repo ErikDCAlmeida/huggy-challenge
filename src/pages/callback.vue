@@ -10,7 +10,7 @@ const token_store = useTokenStore();
 
 async function requestToken() {
   await axios<IToken>(
-    "https://main--huggy-challenge.netlify.app/oauth/access_token",
+    "https://huggy-challenge.netlify.app/oauth/access_token",
     {
       method: "POST",
       headers: {
