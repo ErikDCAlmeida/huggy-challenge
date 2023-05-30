@@ -113,7 +113,7 @@ function clickRow(item: any) {
           ></HCUser>
         </div>
         <HCInput
-          v-model:model-value="item.name"
+          v-model="item.name"
           compact
           readonly
           :disabled="item.disabled"
@@ -122,7 +122,7 @@ function clickRow(item: any) {
           name="name"
         ></HCInput>
         <HCInput
-          v-model:model-value="item.email"
+          v-model="item.email"
           compact
           readonly
           hide-messages
@@ -131,7 +131,7 @@ function clickRow(item: any) {
           name="email"
         ></HCInput>
         <HCInput
-          v-model:model-value="item.phone"
+          v-model="item.phone"
           compact
           readonly
           type="phone"
@@ -231,7 +231,7 @@ function clickRow(item: any) {
       &:hover {
         background-color: #321bde;
         color: #ffffff;
-        border-radius: 2px;
+        border-radius: 4px 4px 0 0;
       }
     }
     &::-webkit-scrollbar {
@@ -262,6 +262,9 @@ function clickRow(item: any) {
       border-radius: 0.5em;
       column-gap: 1.5em;
       transition: all ease-in-out 0.15s;
+      &:hover {
+        background: rgba(0, 0, 0, 0.05);
+      }
     }
   }
   &__footer {

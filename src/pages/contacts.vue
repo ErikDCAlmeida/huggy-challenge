@@ -139,8 +139,6 @@ function clickToDelete({ item, index }: any) {
 }
 
 function clickToEdit({ item, index }: any) {
-  console.log(item, index);
-
   infosUser.value.user = item;
   infosUser.value.userInfosEdit = { ...item };
   infosUser.value.indexUserClicked = index;
@@ -150,8 +148,6 @@ function clickToEdit({ item, index }: any) {
 }
 
 function cancelSaveContact() {
-  console.log(contacts.value, infosUser.value.indexUserClicked);
-
   Object.assign(
     contacts.value[infosUser.value.indexUserClicked],
     infosUser.value.userInfosEdit
@@ -342,8 +338,11 @@ function validatePhone(value: string) {
       @update:value="openDialog = $event"
       persistent
     >
-      <HCCard color="button-color">
-        <div class="pa-4 flex a-center b-1--bottom mb-5 mine-shaft-30--border">
+      <HCCard color="button-color" class="page-contacts__card-visualizer">
+        <div
+          class="page__contacts__card-visualizer__main pa-4 flex a-center b-1--bottom mb-5 mine-shaft-30--border"
+          :style="{ '--width-card-visualizer': '40em' }"
+        >
           <HCUser
             class="mr-4"
             :user="{
@@ -417,10 +416,13 @@ function validatePhone(value: string) {
       @update:value="openDialogDelete = $event"
       :persistent="savingContact"
     >
-      <HCCard color="danger">
-        <div class="pa-5" style="width: 20em">
-          <HCLabel font-style="h2" auto-size>
-            Excluir o contato {{ infosUser.user.name }}?
+      <HCCard color="danger" class="page-contacts__card-delete">
+        <div
+          class="pa-5 page-contacts__card-delete__main"
+          :style="{ '--width-card-delete': '30em' }"
+        >
+          <HCLabel font-style="h2" class="fill-w text-center">
+            Excluir o contato "{{ infosUser.user.name }}"?
           </HCLabel>
           <div class="flex j-end a-center mt-10">
             <HCButton
@@ -439,8 +441,11 @@ function validatePhone(value: string) {
     </HCDialog>
 
     <HCDialog v-model:value="openDialogError.open" persistent>
-      <HCCard color="danger">
-        <div class="pa-5" style="width: 30em">
+      <HCCard color="danger" class="page-contacts__card-error">
+        <div
+          class="pa-5 page-contacts__card-error__main"
+          :style="{ '--width-card-error': '30em' }"
+        >
           <p class="h2 text-center">
             {{ openDialogError.message }}
           </p>
@@ -462,10 +467,10 @@ function validatePhone(value: string) {
       persistent
     >
       <HCCard
-        color="page-contacts__dialog__create-edit button-color"
+        color="page-contacts__card-create-edit button-color"
         :style="{ '--width-card-create-edit': '40em' }"
       >
-        <div class="page-contacts__dialog__create-edit__area">
+        <div class="page-contacts__card-create-edit__area">
           <div class="pa-4 flex a-center b-1--bottom mine-shaft-30--border">
             <HCLabel class="mr-10" fontStyle="h2" ellipsis :size="20">{{
               infosUser.cardTitle
@@ -580,8 +585,20 @@ function validatePhone(value: string) {
     }
   }
 
-  .page-contacts__dialog__create-edit__area {
+  .page-contacts__card-create-edit__area {
     width: var(--width-card-create-edit);
+  }
+
+  .page-contacts__card-delete__main {
+    width: var(--width-card-delete);
+  }
+
+  .page-contacts__card-error__main {
+    width: var(--width-card-error);
+  }
+
+  .page-contacts__card-visualizer__main {
+    width: var(--width-card-visualizer);
   }
 }
 </style>
