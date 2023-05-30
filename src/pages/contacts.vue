@@ -13,8 +13,8 @@ import {
 import { ref, computed, reactive } from "vue";
 import { Form } from "vee-validate";
 import axios from "axios";
-import { useTokenStore } from "@/stores/token";
-import router from "@/router";
+import { useTokenStore } from "../stores/token";
+import { useRouter } from "vue-router";
 
 const token_store = useTokenStore();
 
@@ -23,6 +23,8 @@ const openDialogDelete = ref(false);
 const openDialogEditCreate = ref(false);
 const search = ref("");
 const page = ref(-1);
+
+const router = useRouter();
 
 const savingContact = ref(false);
 

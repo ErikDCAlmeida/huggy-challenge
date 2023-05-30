@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { HCLoadIndicator } from "@/components";
+import { HCLoadIndicator } from "../components";
 import { useRoute } from "vue-router";
-import { useTokenStore, type IToken } from "@/stores/token";
+import { useTokenStore, type IToken } from "../stores/token";
 import axios from "axios";
 
 const route = useRoute();

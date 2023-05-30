@@ -11,8 +11,8 @@
 </template>
 
 <script setup lang="ts">
-import { HCButton, HCLoadIndicator } from "@/components";
-import { useTokenStore, type IToken } from "@/stores/token";
+import { HCButton, HCLoadIndicator } from "../components";
+import { useTokenStore, type IToken } from "../stores/token";
 import axios from "axios";
 import { useRouter } from "vue-router";
 
