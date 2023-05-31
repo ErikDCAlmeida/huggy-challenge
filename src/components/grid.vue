@@ -67,6 +67,9 @@ function clickRow(item: any) {
         <span class="mr-1">Nome</span>
         <HCIcon v-if="sortDesc">arrow-down</HCIcon>
         <HCIcon v-else>arrow-up</HCIcon>
+        <span class="ml-1 hc-grid__header--name-area--number"
+          >({{ arrayNormalized.length }})</span
+        >
       </div>
       <div class="caption flex start-center">E-mail</div>
       <div class="caption flex start-center">Telefone</div>
@@ -172,10 +175,16 @@ function clickRow(item: any) {
     border-radius: 8px 8px 0px 0px;
     overflow-x: auto;
     &--name-area {
+      &--number {
+        color: #321bde;
+      }
       &:hover {
         background-color: #321bde;
         color: #ffffff;
         border-radius: 4px 4px 0 0;
+        .hc-grid__header--name-area--number {
+          color: #ffffff;
+        }
       }
     }
     &::-webkit-scrollbar {

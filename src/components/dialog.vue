@@ -13,17 +13,17 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-const emits = defineEmits(["update:value"]);
+const emits = defineEmits(["update:modelValue"]);
 const props = defineProps({
-  value: Boolean,
+  modelValue: Boolean,
   persistent: Boolean,
 });
 
 const openDialog = computed({
-  get: () => props.value,
+  get: () => props.modelValue,
   set: (value) => {
     if (!props.persistent) {
-      emits("update:value", value);
+      emits("update:modelValue", value);
     }
   },
 });

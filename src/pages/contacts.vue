@@ -2,16 +2,19 @@
 import {
   HCButton,
   HCCard,
-  HCDialog,
   HCGrid,
   HCIcon,
   HCInput,
-  HCUser,
   HCLabel,
   HCLoadIndicator,
-} from "@/components";
+} from "../components";
+import {
+  ContactsDialogDelete,
+  ContactsDialogError,
+  ContactsDialogPerfil,
+  ContactsDialogSaveUser,
+} from "../components/contacts";
 import { ref, computed, reactive } from "vue";
-import { Form } from "vee-validate";
 import axios from "axios";
 import { useTokenStore } from "../stores/token";
 import { useRouter } from "vue-router";
@@ -28,41 +31,9 @@ const router = useRouter();
 
 const savingContact = ref(false);
 
-const sortDesc = ref(false);
-
-let hasMore = true;
+const sortDesc = ref(true);
 
 const contacts = ref<any>([]);
-
-const dialogLabels = computed(() => {
-  return [
-    {
-      id: 1,
-      title: "E-mail",
-      data: infosUser.value.user.email,
-    },
-    {
-      id: 2,
-      title: "Endereço",
-      data: infosUser.value.user.address,
-    },
-    {
-      id: 3,
-      title: "Bairro",
-      data: infosUser.value.user.district,
-    },
-    {
-      id: 4,
-      title: "Cidade",
-      data: infosUser.value.user.city,
-    },
-    {
-      id: 5,
-      title: "Estado",
-      data: infosUser.value.user.state,
-    },
-  ];
-});
 
 const infosUser = ref({
   isNew: false,
@@ -101,6 +72,8 @@ const filteredItems = computed(() => {
     });
 });
 
+let hasMore = true;
+
 async function initialLoad() {
   await onLoadMore();
 }
@@ -126,24 +99,18 @@ function openDialogToCreate() {
 }
 
 function clickRow({ item, index }: any) {
-  infosUser.value.user = item;
-  infosUser.value.indexUserClicked = index;
-  infosUser.value.isNew = false;
+  baseSets(item, index);
   openDialog.value = true;
 }
 
 function clickToDelete({ item, index }: any) {
-  infosUser.value.user = item;
-  infosUser.value.indexUserClicked = index;
-  infosUser.value.isNew = false;
+  baseSets(item, index);
   openDialogDelete.value = true;
 }
 
 function clickToEdit({ item, index }: any) {
-  infosUser.value.user = item;
+  baseSets(item, index);
   infosUser.value.userInfosEdit = { ...item };
-  infosUser.value.indexUserClicked = index;
-  infosUser.value.isNew = false;
   infosUser.value.cardTitle = "Editar Contato";
   openDialogEditCreate.value = true;
 }
@@ -155,6 +122,12 @@ function resetInfos() {
   openDialog.value = false;
   openDialogDelete.value = false;
   openDialogEditCreate.value = false;
+}
+
+function baseSets(item: any, index: number) {
+  infosUser.value.user = item;
+  infosUser.value.indexUserClicked = index;
+  infosUser.value.isNew = false;
 }
 
 async function onLoadMore() {
@@ -189,6 +162,11 @@ async function onLoadMore() {
   });
 }
 
+async function prepareToSaveUser(evt: any) {
+  infosUser.value.userInfosEdit = evt;
+  await submitForm();
+}
+
 async function submitForm() {
   savingContact.value = true;
   await axios(
@@ -215,7 +193,7 @@ async function submitForm() {
   )
     .then(({ data }) => {
       if (infosUser.value.isNew) {
-        filteredItems.value.unshift(data);
+        contacts.value = filteredItems.value.concat([data]);
       } else {
         Object.assign(
           filteredItems.value[infosUser.value.indexUserClicked],
@@ -245,38 +223,12 @@ async function deleteContact() {
       Accept: "application/json",
       Authorization: `${token_store.token.token_type} ${token_store.token.access_token}`,
     },
-  }).then(() =>
-    filteredItems.value.splice(infosUser.value.indexUserClicked, 1)
-  );
+  }).then(() => {
+    filteredItems.value.splice(infosUser.value.indexUserClicked, 1);
+    resetInfos();
+  });
   savingContact.value = false;
   openDialogDelete.value = false;
-}
-
-function validateEmail(value: string) {
-  if (!value) {
-    return "O campo e-mail é obrigatório!";
-  }
-
-  const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-  if (!regex.test(value)) {
-    return "É preciso inserir um e-mail válido!";
-  }
-
-  return true;
-}
-
-function validatePhone(value: string) {
-  if (!value) {
-    return "O campo telefone é obrigatório!";
-  }
-
-  if (value.replace(/\D/g, "").length < 13 || isNaN(Number(value))) {
-    return `O número informado não é válido! Letras aparecem no campo, mas não são contabilizadas. Digite 13 números. (${
-      value.replace(/\D/g, "").length
-    }/13)`;
-  }
-
-  return true;
 }
 </script>
 
@@ -342,239 +294,43 @@ function validatePhone(value: string) {
       </HCCard>
     </div>
 
-    <HCDialog
-      v-model:value="openDialog"
-      @update:value="openDialog = $event"
+    <ContactsDialogPerfil
+      v-model="openDialog"
       persistent
-    >
-      <HCCard color="button-color" class="page-contacts__card-visualizer">
-        <div
-          class="page__contacts__card-visualizer__main pa-4 flex a-center b-1--bottom mb-5 mine-shaft-30--border"
-          :style="{ '--width-card-visualizer': '40em' }"
-        >
-          <HCUser
-            class="mr-4"
-            :user="{
-              id: infosUser.user.id,
-              photo: infosUser.user.photo,
-              initials: 'NA',
-              name: infosUser.user.name,
-            }"
-          />
-          <HCLabel class="mr-10" fontStyle="h2" ellipsis :size="20">{{
-            infosUser.user.name
-          }}</HCLabel>
-          <div class="flex a-center">
-            <HCButton
-              icon
-              flat
-              danger
-              @click="
-                clickToDelete({
-                  item: infosUser.user,
-                  index: infosUser.indexUserClicked,
-                }),
-                  (openDialog = false)
-              "
-            >
-              <HCIcon>delete</HCIcon>
-            </HCButton>
-            <HCButton
-              icon
-              flat
-              class="mx-2"
-              @click="
-                clickToEdit({
-                  item: infosUser.user,
-                  index: infosUser.indexUserClicked,
-                }),
-                  (openDialog = false)
-              "
-            >
-              <HCIcon>edit</HCIcon>
-            </HCButton>
-            <HCButton icon flat @click="resetInfos" danger>
-              <HCIcon>close</HCIcon>
-            </HCButton>
-          </div>
-        </div>
-        <div class="flex col">
-          <div
-            v-for="item in dialogLabels"
-            :key="item.id"
-            class="mb-6 flex a-center"
-          >
-            <HCLabel
-              color="mine-shaft-100"
-              :size="6.5"
-              fontStyle="caption"
-              class="mr-4"
-              align="end"
-              >{{ item.title }}</HCLabel
-            >
-            <HCLabel color="foreground" autoSize fontStyle="body-2">
-              {{ item.data }}
-            </HCLabel>
-          </div>
-        </div>
-      </HCCard>
-    </HCDialog>
+      :user="infosUser.user"
+      @click-to-delete="
+        clickToDelete({
+          item: infosUser.user,
+          index: infosUser.indexUserClicked,
+        })
+      "
+      @click-to-edit="
+        clickToEdit({ item: infosUser.user, index: infosUser.indexUserClicked })
+      "
+      @reset-infos="resetInfos"
+    ></ContactsDialogPerfil>
 
-    <HCDialog
-      v-model:value="openDialogDelete"
-      @update:value="openDialogDelete = $event"
+    <ContactsDialogDelete
+      v-model="openDialogDelete"
       :persistent="savingContact"
-    >
-      <HCCard color="danger" class="page-contacts__card-delete">
-        <div
-          class="pa-5 page-contacts__card-delete__main"
-          :style="{ '--width-card-delete': '30em' }"
-        >
-          <HCLabel font-style="h2" class="fill-w text-center">
-            Excluir o contato "{{ infosUser.user.name }}"?
-          </HCLabel>
-          <div class="flex j-end a-center mt-10">
-            <HCButton
-              secondary
-              class="mr-5"
-              :disabled="savingContact"
-              @click="resetInfos"
-              >Cancelar</HCButton
-            >
-            <HCButton danger :loading="savingContact" @click="deleteContact"
-              >Excluir</HCButton
-            >
-          </div>
-        </div>
-      </HCCard>
-    </HCDialog>
+      :user="infosUser.user"
+      @delete-contact="deleteContact"
+      @reset-infos="resetInfos"
+    ></ContactsDialogDelete>
 
-    <HCDialog v-model:value="openDialogError.open" persistent>
-      <HCCard color="danger" class="page-contacts__card-error">
-        <div
-          class="pa-5 page-contacts__card-error__main"
-          :style="{ '--width-card-error': '30em' }"
-        >
-          <p class="h2 text-center">
-            {{ openDialogError.message }}
-          </p>
-          <div class="flex j-end a-center mt-10">
-            <HCButton
-              danger
-              :loading="savingContact"
-              @click="openDialogError.open = false"
-              >Tudo bem</HCButton
-            >
-          </div>
-        </div>
-      </HCCard>
-    </HCDialog>
+    <ContactsDialogError
+      v-model="openDialogError.open"
+      :persistent="savingContact"
+      :message="openDialogError.message"
+    ></ContactsDialogError>
 
-    <HCDialog
-      v-model:value="openDialogEditCreate"
-      @update:value="openDialogEditCreate = $event"
-      persistent
-    >
-      <HCCard
-        color="page-contacts__card-create-edit button-color"
-        :style="{ '--width-card-create-edit': '40em' }"
-      >
-        <div class="page-contacts__card-create-edit__area">
-          <div class="pa-4 flex a-center b-1--bottom mine-shaft-30--border">
-            <HCLabel class="mr-10" fontStyle="h2" ellipsis :size="20">{{
-              infosUser.cardTitle
-            }}</HCLabel>
-          </div>
-          <Form
-            v-slot="{ meta }"
-            class="pt-4 mb-1"
-            validate-on-mount
-            @submit="submitForm"
-          >
-            <div class="px-4 b-1--bottom mine-shaft-30--border">
-              <HCInput
-                v-model="infosUser.userInfosEdit.name"
-                class="mb-1"
-                label="Nome"
-                name="nome"
-                placeholder="Nome completo"
-                rules="required"
-              ></HCInput>
-              <HCInput
-                v-model="infosUser.userInfosEdit.email"
-                class="mb-1"
-                label="Email"
-                name="e-mail"
-                placeholder="E-mail"
-                :rules="validateEmail"
-              ></HCInput>
-              <HCInput
-                v-model="infosUser.userInfosEdit.phone"
-                class="mb-1"
-                label="Telefone"
-                type="phone"
-                name="telefone"
-                max="20"
-                placeholder="Telefone"
-                :rules="validatePhone"
-              ></HCInput>
-              <HCInput
-                v-model="infosUser.userInfosEdit.mobile"
-                class="mb-1"
-                label="Celular"
-                type="phone"
-                name="celular"
-                max="20"
-                placeholder="Celular"
-                :rules="validatePhone"
-              ></HCInput>
-              <HCInput
-                v-model="infosUser.userInfosEdit.address"
-                class="mb-1"
-                label="Endereço"
-                placeholder="Endereço"
-                name="endereço"
-              ></HCInput>
-              <HCInput
-                v-model="infosUser.userInfosEdit.district"
-                class="mb-1"
-                label="Bairro"
-                placeholder="Bairro"
-                name="bairro"
-              ></HCInput>
-              <div class="flex fill-w mb-1">
-                <HCInput
-                  v-model="infosUser.userInfosEdit.city"
-                  class="mr-2 flex-1"
-                  label="Cidade"
-                  placeholder="Cidade"
-                  name="cidade"
-                ></HCInput>
-                <HCInput
-                  v-model="infosUser.userInfosEdit.state"
-                  class="ml-2 flex-1"
-                  label="Estado"
-                  placeholder="Estado"
-                  name="estado"
-                ></HCInput>
-              </div>
-            </div>
-            <div class="flex j-end a-center pa-4">
-              <HCButton
-                secondary
-                class="mr-5"
-                :disabled="savingContact"
-                @click="resetInfos"
-                >Cancelar</HCButton
-              >
-              <HCButton :disabled="!meta.valid" :loading="savingContact"
-                >Salvar</HCButton
-              >
-            </div>
-          </Form>
-        </div>
-      </HCCard>
-    </HCDialog>
+    <ContactsDialogSaveUser
+      v-model="openDialogEditCreate"
+      :persistent="savingContact"
+      :infos-user="infosUser"
+      @submit-form="prepareToSaveUser"
+      @reset-infos="resetInfos"
+    ></ContactsDialogSaveUser>
   </HCLoadIndicator>
 </template>
 
@@ -592,22 +348,6 @@ function validatePhone(value: string) {
     &__card {
       box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     }
-  }
-
-  .page-contacts__card-create-edit__area {
-    width: var(--width-card-create-edit);
-  }
-
-  .page-contacts__card-delete__main {
-    width: var(--width-card-delete);
-  }
-
-  .page-contacts__card-error__main {
-    width: var(--width-card-error);
-  }
-
-  .page-contacts__card-visualizer__main {
-    width: var(--width-card-visualizer);
   }
 }
 </style>
