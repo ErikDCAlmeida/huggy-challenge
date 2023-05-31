@@ -36,21 +36,6 @@ useInfiniteScroll(
 );
 
 const pressedLine = ref(-1);
-// const requestPageValue = computed(() => props.request.page);
-
-// const actualPage = ref(0);
-
-// const pageNormalized = computed({
-//   get: () => requestPageValue.value,
-//   set: (newValue) => {
-//     if (newValue >= 1 && newValue <= totalPageNormalized.value) {
-//       actualPage.value = newValue;
-//       emits("update:modelValue", newValue);
-//     }
-//   },
-// });
-
-// const totalPageNormalized = computed(() => props.request?.totalPages);
 
 const arrayNormalized = computed({
   get: () => {
@@ -149,7 +134,7 @@ function clickRow(item: any) {
             icon
             flat
             class="mr-2"
-            @click.stop="$emit('edit', { item, index })"
+            @click.stop="emits('edit', { item, index })"
           >
             <HCIcon name="edit" />
           </HCButton>
@@ -161,54 +146,13 @@ function clickRow(item: any) {
             icon
             flat
             danger
-            @click.stop="$emit('delete', { item, index })"
+            @click.stop="emits('delete', { item, index })"
           >
             <HCIcon name="delete" />
           </HCButton>
         </div>
       </div>
     </div>
-    <!-- <div v-if="request?.totalPages > 1" class="hc-grid__footer pa-2 flex">
-      <div class="flex-1"></div>
-      <div class="flex start-center hc-grid__footer__pagination">
-        <HCButton
-          icon
-          primary
-          class="hc-grid__footer__pagination__btn"
-          @click="$emit('down-button')"
-        >
-          <HCIcon>arrow-down</HCIcon>
-        </HCButton>
-        <HCInput
-          v-model:modelValue="pageNormalized"
-          text-center
-          type="number"
-          hide-messages
-          :min="1"
-          :max="totalPageNormalized"
-          :max-size="4"
-          class="hc-grid__footer__pagination__page mx-1"
-          @update:modelValue="pageNormalized = $event"
-        ></HCInput>
-        <div class="hc-grid__footer__pagination__separator"></div>
-        <HCInput
-          v-model:model-value="totalPageNormalized"
-          readonly
-          hide-messages
-          :max-size="4"
-          text-center
-          class="hc-grid__footer__pagination__page mx-1"
-        ></HCInput>
-        <HCButton
-          class="hc-grid__footer__pagination__btn"
-          icon
-          primary
-          @click="$emit('up-button')"
-        >
-          <HCIcon>arrow-up</HCIcon>
-        </HCButton>
-      </div>
-    </div> -->
   </div>
 </template>
 

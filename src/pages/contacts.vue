@@ -69,7 +69,7 @@ const infosUser = ref({
   cardTitle: "",
   user: {} as any,
   userInfosEdit: {} as any,
-  indexUserClicked: 0,
+  indexUserClicked: -1,
   baseUser: {
     id: 0,
     name: "",
@@ -106,8 +106,8 @@ async function initialLoad() {
 }
 
 function openDialogToCreate() {
-  infosUser.value.user = {
-    id: 0,
+  infosUser.value.userInfosEdit = {
+    id: undefined,
     name: "",
     email: "",
     phone: "",
@@ -119,6 +119,7 @@ function openDialogToCreate() {
     city: "",
     mobile: "",
   };
+  infosUser.value.indexUserClicked = -1;
   infosUser.value.isNew = true;
   infosUser.value.cardTitle = "Adicionar Contato";
   openDialogEditCreate.value = true;
@@ -147,11 +148,12 @@ function clickToEdit({ item, index }: any) {
   openDialogEditCreate.value = true;
 }
 
-function cancelSaveContact() {
-  Object.assign(
-    contacts.value[infosUser.value.indexUserClicked],
-    infosUser.value.userInfosEdit
-  );
+function resetInfos() {
+  infosUser.value.user = {};
+  infosUser.value.userInfosEdit = {};
+  infosUser.value.indexUserClicked = -1;
+  openDialog.value = false;
+  openDialogDelete.value = false;
   openDialogEditCreate.value = false;
 }
 
@@ -203,19 +205,22 @@ async function submitForm() {
       },
       data: infosUser.value.isNew
         ? {
-            ...infosUser.value.user,
+            ...infosUser.value.userInfosEdit,
             id: undefined,
           }
         : {
-            ...infosUser.value.user,
+            ...infosUser.value.userInfosEdit,
           },
     }
   )
     .then(({ data }) => {
       if (infosUser.value.isNew) {
-        contacts.value.unshift(data);
+        filteredItems.value.unshift(data);
       } else {
-        Object.assign(contacts.value[infosUser.value.indexUserClicked], data);
+        Object.assign(
+          filteredItems.value[infosUser.value.indexUserClicked],
+          data
+        );
       }
       openDialogEditCreate.value = false;
     })
@@ -240,7 +245,9 @@ async function deleteContact() {
       Accept: "application/json",
       Authorization: `${token_store.token.token_type} ${token_store.token.access_token}`,
     },
-  }).then(() => contacts.value.splice(infosUser.value.indexUserClicked, 1));
+  }).then(() =>
+    filteredItems.value.splice(infosUser.value.indexUserClicked, 1)
+  );
   savingContact.value = false;
   openDialogDelete.value = false;
 }
@@ -263,8 +270,10 @@ function validatePhone(value: string) {
     return "O campo telefone é obrigatório!";
   }
 
-  if (value.replace(/\D/g, "").length < 13) {
-    return "O número informado não é válido!";
+  if (value.replace(/\D/g, "").length < 13 || isNaN(Number(value))) {
+    return `O número informado não é válido! Letras aparecem no campo, mas não são contabilizadas. Digite 13 números. (${
+      value.replace(/\D/g, "").length
+    }/13)`;
   }
 
   return true;
@@ -384,7 +393,7 @@ function validatePhone(value: string) {
             >
               <HCIcon>edit</HCIcon>
             </HCButton>
-            <HCButton icon flat @click="openDialog = false" danger>
+            <HCButton icon flat @click="resetInfos" danger>
               <HCIcon>close</HCIcon>
             </HCButton>
           </div>
@@ -429,7 +438,7 @@ function validatePhone(value: string) {
               secondary
               class="mr-5"
               :disabled="savingContact"
-              @click="openDialogDelete = false"
+              @click="resetInfos"
               >Cancelar</HCButton
             >
             <HCButton danger :loading="savingContact" @click="deleteContact"
@@ -484,7 +493,7 @@ function validatePhone(value: string) {
           >
             <div class="px-4 b-1--bottom mine-shaft-30--border">
               <HCInput
-                v-model="infosUser.user.name"
+                v-model="infosUser.userInfosEdit.name"
                 class="mb-1"
                 label="Nome"
                 name="nome"
@@ -492,7 +501,7 @@ function validatePhone(value: string) {
                 rules="required"
               ></HCInput>
               <HCInput
-                v-model="infosUser.user.email"
+                v-model="infosUser.userInfosEdit.email"
                 class="mb-1"
                 label="Email"
                 name="e-mail"
@@ -500,7 +509,7 @@ function validatePhone(value: string) {
                 :rules="validateEmail"
               ></HCInput>
               <HCInput
-                v-model="infosUser.user.phone"
+                v-model="infosUser.userInfosEdit.phone"
                 class="mb-1"
                 label="Telefone"
                 type="phone"
@@ -510,7 +519,7 @@ function validatePhone(value: string) {
                 :rules="validatePhone"
               ></HCInput>
               <HCInput
-                v-model="infosUser.user.mobile"
+                v-model="infosUser.userInfosEdit.mobile"
                 class="mb-1"
                 label="Celular"
                 type="phone"
@@ -520,14 +529,14 @@ function validatePhone(value: string) {
                 :rules="validatePhone"
               ></HCInput>
               <HCInput
-                v-model="infosUser.user.address"
+                v-model="infosUser.userInfosEdit.address"
                 class="mb-1"
                 label="Endereço"
                 placeholder="Endereço"
                 name="endereço"
               ></HCInput>
               <HCInput
-                v-model="infosUser.user.district"
+                v-model="infosUser.userInfosEdit.district"
                 class="mb-1"
                 label="Bairro"
                 placeholder="Bairro"
@@ -535,14 +544,14 @@ function validatePhone(value: string) {
               ></HCInput>
               <div class="flex fill-w mb-1">
                 <HCInput
-                  v-model="infosUser.user.city"
+                  v-model="infosUser.userInfosEdit.city"
                   class="mr-2 flex-1"
                   label="Cidade"
                   placeholder="Cidade"
                   name="cidade"
                 ></HCInput>
                 <HCInput
-                  v-model="infosUser.user.state"
+                  v-model="infosUser.userInfosEdit.state"
                   class="ml-2 flex-1"
                   label="Estado"
                   placeholder="Estado"
@@ -555,7 +564,7 @@ function validatePhone(value: string) {
                 secondary
                 class="mr-5"
                 :disabled="savingContact"
-                @click="cancelSaveContact"
+                @click="resetInfos"
                 >Cancelar</HCButton
               >
               <HCButton :disabled="!meta.valid" :loading="savingContact"
