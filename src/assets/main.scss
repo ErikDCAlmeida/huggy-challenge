@@ -76,6 +76,11 @@
   letter-spacing: 0.4px !important;
 }
 
+.small {
+  @extend caption !optional;
+  font-size: 0.65em;
+}
+
 .pa-0 {
   padding: 0 !important;
 }

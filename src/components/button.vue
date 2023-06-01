@@ -44,7 +44,11 @@
       <img src="@/assets/preloader.svg" :width="16" />
     </div>
     <div class="flex center">
-      <div v-if="slotIconActived" class="mr-2 caption flex center">
+      <div
+        v-if="slotIconActived"
+        class="caption flex center"
+        :class="{ 'mr-2': !icon }"
+      >
         <slot name="icon"></slot>
       </div>
       <slot></slot>

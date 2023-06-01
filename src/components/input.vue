@@ -26,14 +26,12 @@
       <input
         ref="input"
         v-model="valueInput"
-        :class="[
-          'hc-input__area-input__input pa-1 body-2 flex-1',
-          {
-            'mine-shaft-60--text c-not-allowed': disabled,
-            'c-default': readonly,
-            'hc-input__area-input__input--text-center': textCenter,
-          },
-        ]"
+        class="hc-input__area-input__input pa-1 body-2 flex-1"
+        :class="{
+          'mine-shaft-60--text c-not-allowed': disabled,
+          'c-default': readonly,
+          'hc-input__area-input__input--text-center': textCenter,
+        }"
         :type="type"
         :style="`width: ${maxSize}em !important`"
         :placeholder="placeholder"

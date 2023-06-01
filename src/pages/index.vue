@@ -11,14 +11,51 @@
 </template>
 
 <script setup lang="ts">
+import { useWindowSize } from "@vueuse/core";
 import { HCButton, HCLoadIndicator } from "../components";
 import { useTokenStore, type IToken } from "../stores/token";
 import axios from "axios";
 import { useRouter } from "vue-router";
+import { reactive, watchEffect } from "vue";
 
 const token_store = useTokenStore();
 
 const router = useRouter();
+
+const { width, height } = useWindowSize();
+
+const sizes = reactive({
+  width: 0,
+  height: 0,
+  top: 100,
+  left: 100,
+  s: "",
+});
+
+watchEffect(() => {
+  // 1280 x 720
+  if (width.value >= 1280) {
+    sizes.width = Math.floor(width.value * 0.4);
+    sizes.height = Math.floor(height.value * 0.8);
+    sizes.s = "l";
+  }
+  // 640 x 480
+  if (width.value >= 640 && width.value < 1280) {
+    sizes.width = Math.floor(width.value * 0.7);
+    sizes.height = Math.floor(height.value * 0.7);
+    sizes.s = "m";
+  }
+  // 320 x 240
+  if (width.value < 640) {
+    sizes.width = Math.floor(width.value * 0.9);
+    sizes.height = Math.floor(height.value * 0.7);
+    sizes.top = 5;
+    sizes.left = 5;
+    sizes.s = "s";
+  }
+
+  return sizes;
+});
 
 async function initialLoad() {
   if (!token_store.token.access_token) {
@@ -53,7 +90,7 @@ function goToRegister() {
       import.meta.env.VITE_CLIENT_ID
     }`,
     "_blank",
-    "width=700, height=800, top=100, left=100"
+    `width=${sizes.width}, height=${sizes.height}, top=${sizes.top}, left=${sizes.left}`
   );
 
   const popupClosed = setInterval(() => {
@@ -68,7 +105,7 @@ function goToRegister() {
 </script>
 
 <style lang="scss">
-.home-btn {
+.heightome-btn {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 </style>

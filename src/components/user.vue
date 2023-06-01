@@ -1,5 +1,9 @@
 <template>
-  <div class="hc-user flex center background-user--bg" :key="user.id">
+  <div
+    class="hc-user flex center background-user--bg"
+    :key="user.id"
+    :style="{ '--size': `${size}px` }"
+  >
     <img
       v-if="user.photo"
       class="hc-user__img"
@@ -27,13 +31,17 @@ defineProps({
     type: Object as PropType<UserType>,
     default: null,
   },
+  size: {
+    type: String,
+    default: "32",
+  },
 });
 </script>
 
 <style lang="scss">
 .hc-user {
-  width: 32px;
-  height: 32px;
+  width: var(--size);
+  height: var(--size);
   border-radius: 50%;
   overflow: hidden;
   &__img {

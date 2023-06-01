@@ -18,16 +18,17 @@ import { ref, computed, reactive } from "vue";
 import axios from "axios";
 import { useTokenStore } from "../stores/token";
 import { useRouter } from "vue-router";
+import { useWindowSize } from "@vueuse/core";
 
+const { width } = useWindowSize();
 const token_store = useTokenStore();
+const router = useRouter();
 
 const openDialog = ref(false);
 const openDialogDelete = ref(false);
 const openDialogEditCreate = ref(false);
 const search = ref("");
 const page = ref(-1);
-
-const router = useRouter();
 
 const savingContact = ref(false);
 
@@ -59,6 +60,10 @@ const infosUser = ref({
 const openDialogError = reactive({
   open: false,
   message: "",
+});
+
+const smallScreen = computed(() => {
+  return { small: width.value <= 500, xSmall: width.value <= 300 };
 });
 
 const filteredItems = computed(() => {
@@ -238,7 +243,10 @@ async function deleteContact() {
     class="page-contacts"
     content-class="fill-h flex center"
   >
-    <div class="fill-a flex col center page-contacts__area">
+    <div
+      class="fill-a flex col center page-contacts__area mx-5"
+      :style="{ '--width-card-main': '70em' }"
+    >
       <HCLabel font-style="h2" class="text-start fill-w mb-3">Contatos</HCLabel>
 
       <HCCard
@@ -246,22 +254,20 @@ async function deleteContact() {
         class="page-contacts__area__card fill-w fill-h flex col"
       >
         <div class="page-contacts__area__top flex a-center j-between pa-4">
-          <HCInput
-            v-model:modelValue="search"
-            :max-size="15.625"
-            hide-messages
-            name="search"
-            @update:modelValue="search = $event"
-          >
+          <HCInput v-model="search" hide-messages name="search">
             <template #icon>
               <HCIcon>search</HCIcon>
             </template>
           </HCInput>
-          <HCButton class="button-font" @click="openDialogToCreate">
+          <HCButton
+            :icon="smallScreen.small"
+            class="button-font"
+            @click="openDialogToCreate"
+          >
             <template #icon>
               <HCIcon>add</HCIcon>
             </template>
-            <p>Adicionar contato</p>
+            <p v-if="!smallScreen.small">Adicionar contato</p>
           </HCButton>
         </div>
         <div class="page-contacts__area__main ma-2">
@@ -337,8 +343,7 @@ async function deleteContact() {
 <style lang="scss">
 .page-contacts {
   &__area {
-    margin: 0 auto !important;
-    width: 70vw !important;
+    width: var(--width-card-main) !important;
     height: 90vh !important;
 
     &__main {
