@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { type PropType, computed } from "vue";
 import { HCButton, HCCard, HCDialog, HCLabel } from "../../components";
+import { useWindowSize } from "@vueuse/core";
 
 const props = defineProps({
   persistent: Boolean,
@@ -13,6 +14,10 @@ const props = defineProps({
 });
 
 const emits = defineEmits(["update:modelValue", "resetInfos", "deleteContact"]);
+
+const { width } = useWindowSize();
+
+const small = computed(() => width.value < 520);
 
 const openDialog = computed({
   get: () => props.modelValue,
@@ -29,10 +34,10 @@ const openDialog = computed({
     <HCCard color="danger" class="page-contacts__card-delete">
       <div
         class="pa-5 page-contacts__card-delete__main"
-        :style="{ '--width-card-delete': `${size}em` }"
+        :style="{ '--width-card-delete': small ? '95vw' : `${size}em` }"
       >
-        <HCLabel font-style="h2" class="fill-w text-center">
-          Excluir o contato "{{ user.name }}"?
+        <HCLabel font-style="h2" ellipsis class="fill-w text-center">
+          Excluir o contato "{{ user.name }}" ?
         </HCLabel>
         <div class="flex j-end a-center mt-10">
           <HCButton
@@ -51,8 +56,10 @@ const openDialog = computed({
   </HCDialog>
 </template>
 
-<style>
-.page-contacts__card-delete__main {
-  width: var(--width-card-delete);
+<style lang="scss">
+.page-contacts__card-delete {
+  &__main {
+    width: var(--width-card-delete);
+  }
 }
 </style>

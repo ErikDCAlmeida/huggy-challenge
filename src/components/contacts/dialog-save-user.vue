@@ -2,6 +2,7 @@
 import { type PropType, computed } from "vue";
 import { HCButton, HCCard, HCDialog, HCLabel, HCInput } from "../../components";
 import { Form } from "vee-validate";
+import { useWindowSize } from "@vueuse/core";
 
 const props = defineProps({
   persistent: Boolean,
@@ -18,6 +19,16 @@ const emits = defineEmits<{
   (evt: "resetInfos"): void;
   (evt: "submitForm", value: any): void;
 }>();
+
+const { width } = useWindowSize();
+
+const smallScreen = computed(() => {
+  return width.value < 660;
+});
+
+const xSmallScreen = computed(() => {
+  return width.value < 500;
+});
 
 const infos = computed(() => {
   return props.infosUser;
@@ -65,7 +76,9 @@ function validatePhone(value: string) {
     <HCCard color="page-contacts__card-save-user button-color">
       <div
         class="page-contacts__card-save-user__area"
-        :style="{ '--width-card-save-user': `${size}em` }"
+        :style="{
+          '--width-card-save-user': smallScreen ? '95vw' : `${size}em`,
+        }"
       >
         <div class="pa-4 flex a-center b-1--bottom mine-shaft-30--border">
           <HCLabel class="mr-10" fontStyle="h2" ellipsis :size="20">{{
@@ -129,17 +142,19 @@ function validatePhone(value: string) {
               placeholder="Bairro"
               name="bairro"
             ></HCInput>
-            <div class="flex fill-w mb-1">
+            <div class="flex fill-w mb-1" :class="{ col: xSmallScreen }">
               <HCInput
                 v-model="infos.userInfosEdit.city"
-                class="mr-2 flex-1"
+                class="flex-1"
+                :class="{ 'mr-2': !xSmallScreen }"
                 label="Cidade"
                 placeholder="Cidade"
                 name="cidade"
               ></HCInput>
               <HCInput
                 v-model="infos.userInfosEdit.state"
-                class="ml-2 flex-1"
+                class="flex-1"
+                :class="{ 'ml-2': !xSmallScreen }"
                 label="Estado"
                 placeholder="Estado"
                 name="estado"

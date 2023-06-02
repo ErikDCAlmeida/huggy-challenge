@@ -8,6 +8,9 @@ import {
   HCUser,
   HCLabel,
 } from "../../components";
+import { useWindowSize } from "@vueuse/core";
+
+const { width } = useWindowSize();
 
 const props = defineProps({
   persistent: Boolean,
@@ -33,6 +36,10 @@ const openDialog = computed({
       emits("update:modelValue", value);
     }
   },
+});
+
+const smallScreen = computed(() => {
+  return width.value <= 600;
 });
 
 const dialogLabels = computed(() => {
@@ -68,60 +75,118 @@ const dialogLabels = computed(() => {
 
 <template>
   <HCDialog v-model="openDialog" :persistent="persistent">
-    <HCCard color="button-color" class="page-contacts__card-visualizer">
-      <div
-        class="page__contacts__card-visualizer__main pa-4 flex a-center b-1--bottom mb-5 mine-shaft-30--border"
-        :style="{ '--width-card-visualizer': `${size}em` }"
-      >
-        <HCUser
-          class="mr-4"
-          :user="{
-            id: user.id,
-            photo: user.photo,
-            initials: 'NA',
-            name: user.name,
-          }"
-        />
-        <HCLabel class="mr-10" fontStyle="h2" ellipsis :size="20">{{
-          user.name
-        }}</HCLabel>
-        <div class="flex a-center">
-          <HCButton icon flat danger @click="emits('clickToDelete')">
-            <HCIcon>delete</HCIcon>
-          </HCButton>
-          <HCButton icon flat class="mx-2" @click="emits('clickToEdit')">
-            <HCIcon>edit</HCIcon>
-          </HCButton>
-          <HCButton icon flat @click="emits('resetInfos')" danger>
-            <HCIcon>close</HCIcon>
-          </HCButton>
-        </div>
-      </div>
-      <div class="flex col">
+    <HCCard
+      color="button-color"
+      class="page-contacts__card-visualizer"
+      :style="{ '--width-card-visualizer': smallScreen ? '90vw' : `${size}em` }"
+    >
+      <div class="page-contacts__card-visualizer__general">
         <div
-          v-for="item in dialogLabels"
-          :key="item.id"
-          class="mb-6 flex a-center"
+          class="pa-4 flex a-center b-1--bottom mb-5 mine-shaft-30--border"
+          :class="{
+            'page-contacts__card-visualizer__general__top--small': smallScreen,
+            'page-contacts__card-visualizer__general__top': !smallScreen,
+          }"
         >
-          <HCLabel
-            color="mine-shaft-100"
-            :size="6.5"
-            fontStyle="caption"
-            class="mr-4"
-            align="end"
-            >{{ item.title }}</HCLabel
+          <div
+            class="flex a-center fill-w page-contacts__card-visualizer__general__top__user"
+            :class="{
+              'page-contacts__card-visualizer__general__top--small__user':
+                smallScreen,
+            }"
           >
-          <HCLabel color="foreground" autoSize fontStyle="body-2">
-            {{ item.data }}
-          </HCLabel>
+            <HCUser
+              class="mr-4"
+              :user="{
+                id: user.id,
+                photo: user.photo,
+                initials: 'NA',
+                name: user.name,
+              }"
+              :size="smallScreen ? '48' : '32'"
+            />
+            <HCLabel class="flex-1" fontStyle="h2" ellipsis>{{
+              user.name
+            }}</HCLabel>
+          </div>
+          <div
+            class="flex a-center page-contacts__card-visualizer__general__top__actions"
+            :class="{
+              'page-contacts__card-visualizer__general__top--small__actions fill-w flex end-center mb-5':
+                smallScreen,
+            }"
+          >
+            <HCButton icon flat danger @click="emits('clickToDelete')">
+              <HCIcon>delete</HCIcon>
+            </HCButton>
+            <HCButton
+              icon
+              flat
+              class="mx-2"
+              :class="{ 'mx-4': smallScreen }"
+              @click="emits('clickToEdit')"
+            >
+              <HCIcon>edit</HCIcon>
+            </HCButton>
+            <HCButton icon flat @click="emits('resetInfos')" danger>
+              <HCIcon>close</HCIcon>
+            </HCButton>
+          </div>
+        </div>
+        <div
+          :class="{
+            'page-contacts__card-visualizer__general__main--small col start px-5':
+              smallScreen,
+            'flex col page-contacts__card-visualizer__general__main overflow-hidden':
+              !smallScreen,
+          }"
+        >
+          <div
+            v-for="item in dialogLabels"
+            :key="item.id"
+            class="mb-5 flex a-center mr-5"
+            :class="{
+              'page-contacts__card-visualizer__general__main--small__item flex col start':
+                smallScreen,
+            }"
+          >
+            <HCLabel
+              color="mine-shaft-100"
+              :size="6.5"
+              fontStyle="caption"
+              class="mr-4"
+              :class="{ 'mb-1': smallScreen }"
+              :align="smallScreen ? 'start' : 'end'"
+              >{{ item.title }}</HCLabel
+            >
+            <HCLabel
+              color="foreground"
+              autoSize
+              fontStyle="body-2"
+              ellipsis
+              class="overflow-hidden"
+            >
+              {{ item.data }}
+            </HCLabel>
+          </div>
         </div>
       </div>
     </HCCard>
   </HCDialog>
 </template>
 
-<style>
-.page-contacts__card-visualizer__main {
+<style lang="scss">
+.page-contacts__card-visualizer__general {
   width: var(--width-card-visualizer);
+  &__top {
+    &--small {
+      flex-direction: column-reverse !important;
+      &__actions {
+        span {
+          font-size: 1.2em !important;
+        }
+      }
+    }
+  }
 }
 </style>

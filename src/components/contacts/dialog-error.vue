@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { type PropType, computed } from "vue";
-import { HCButton, HCCard, HCDialog } from "../../components";
+import { HCButton, HCCard, HCDialog, HCLabel } from "../../components";
+import { useWindowSize } from "@vueuse/core";
 
 const props = defineProps({
   persistent: Boolean,
@@ -14,6 +15,10 @@ const props = defineProps({
 });
 
 const emits = defineEmits(["update:modelValue"]);
+
+const { width } = useWindowSize();
+
+const small = computed(() => width.value < 520);
 
 const openDialog = computed({
   get: () => props.modelValue,
@@ -30,11 +35,11 @@ const openDialog = computed({
     <HCCard color="danger" class="page-contacts__card-error">
       <div
         class="pa-5 page-contacts__card-error__main"
-        :style="{ '--width-card-error': `${size}em` }"
+        :style="{ '--width-card-error': small ? '95vw' : `${size}em` }"
       >
-        <p class="h2 text-center">
+        <HCLabel font-style="h2" ellipsis class="fill-w text-center">
           {{ message }}
-        </p>
+        </HCLabel>
         <div class="flex j-end a-center mt-10">
           <HCButton danger :loading="persistent" @click="openDialog = false"
             >Tudo bem</HCButton
@@ -45,4 +50,10 @@ const openDialog = computed({
   </HCDialog>
 </template>
 
-<style></style>
+<style lang="scss">
+.page-contacts__card-error {
+  &__main {
+    width: var(--width-card-error);
+  }
+}
+</style>

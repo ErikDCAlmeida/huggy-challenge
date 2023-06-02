@@ -89,6 +89,18 @@
   border: unset !important;
 }
 
+.overflow-hidden {
+  overflow: hidden !important;
+}
+
+.relative {
+  position: relative !important;
+}
+
+.absolute {
+  position: absolute !important;
+}
+
 // Colors
 $colors: (
   background: #f8f8f8,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { HCUser, HCButton, HCIcon, HCInput } from "@/components";
+import { HCUser, HCButton, HCIcon, HCInput, HCProgress } from "@/components";
 import { ref, type PropType, computed, reactive, watchEffect } from "vue";
 import { useInfiniteScroll, useWindowSize } from "@vueuse/core";
 
@@ -51,7 +51,7 @@ const props = defineProps({
 
 const element = ref();
 
-useInfiniteScroll(
+const { isLoading } = useInfiniteScroll(
   element,
   async () => {
     await props.onLoadMore();
@@ -85,6 +85,27 @@ function clickRow(item: any) {
   }
   emits("click-row", item);
 }
+
+const controlLoadBar = reactive({
+  old: 0,
+  new: props.request.length,
+});
+
+watchEffect(() => {
+  const oldData = controlLoadBar.new;
+  controlLoadBar.new = props.request.length;
+  controlLoadBar.old = oldData;
+});
+
+const noMore = computed(() => {
+  if (!controlLoadBar.new && !controlLoadBar.old) {
+    return true;
+  }
+  return !(
+    controlLoadBar.new - controlLoadBar.old > 0 &&
+    controlLoadBar.new - controlLoadBar.old < 20
+  );
+});
 </script>
 
 <template>
@@ -97,24 +118,31 @@ function clickRow(item: any) {
       '--size-avatar': sizes.list ? (!sizes.minimum ? '5em' : '4em') : '3em',
     }"
   >
-    <div v-if="!sizes.list" class="hc-grid__header">
-      <div></div>
-      <div class="hc-grid__header__title-infos">
-        <div
-          class="flex align-center c-pointer caption py-2 pl-2 hc-grid__header__title-infos__name-area"
-          @click="emits('update:sortDesc', !sortDesc)"
-        >
-          <span class="mr-1">Nome</span>
-          <HCIcon v-if="sortDesc">arrow-down</HCIcon>
-          <HCIcon v-else>arrow-up</HCIcon>
-          <span class="ml-1 hc-grid__header__title-infos__name-area--number"
-            >({{ arrayNormalized.length }})</span
+    <div class="relative">
+      <div v-if="!sizes.list" class="hc-grid__header">
+        <div></div>
+        <div class="hc-grid__header__title-infos">
+          <div
+            class="flex align-center c-pointer caption py-2 pl-2 hc-grid__header__title-infos__name-area"
+            @click="emits('update:sortDesc', !sortDesc)"
           >
+            <span class="mr-1">Nome</span>
+            <HCIcon v-if="sortDesc">arrow-down</HCIcon>
+            <HCIcon v-else>arrow-up</HCIcon>
+            <span class="ml-1 hc-grid__header__title-infos__name-area--number"
+              >({{ arrayNormalized.length }})</span
+            >
+          </div>
+          <div class="caption flex start-center">E-mail</div>
+          <div class="caption flex start-center">Telefone</div>
         </div>
-        <div class="caption flex start-center">E-mail</div>
-        <div class="caption flex start-center">Telefone</div>
+        <div v-if="!sizes.noActions"></div>
       </div>
-      <div v-if="!sizes.noActions"></div>
+      <HCProgress
+        v-if="isLoading && noMore"
+        class="absolute"
+        indeterminate
+      ></HCProgress>
     </div>
     <div class="hc-grid__body" ref="element">
       <div
@@ -273,7 +301,7 @@ function clickRow(item: any) {
           background-color: #321bde;
           color: #ffffff;
           border-radius: 4px 4px 0 0;
-          .hc-grid__header--name-area--number {
+          .hc-grid__header__title-infos__name-area--number {
             color: #ffffff;
           }
         }

@@ -45,13 +45,13 @@ defineProps({
 <style lang="scss">
 .hc-label {
   &--ellipsis {
-    white-space: nowrap;
+    // white-space: nowrap;
     width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   &--content-size {
-    width: max-content !important;
+    width: 100% !important;
   }
 }
 </style>
